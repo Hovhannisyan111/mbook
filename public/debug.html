@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MBOOK - Debug</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .debug-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <h1>MBook3 Debug Page</h1>
+    
+    <div class="debug-info">
+        <h3>Current Page Info:</h3>
+        <p><strong>URL:</strong> <span id="currentUrl"></span></p>
+        <p><strong>Pathname:</strong> <span id="pathname"></span></p>
+        <p><strong>Host:</strong> <span id="host"></span></p>
+    </div>
+
+    <div class="debug-info">
+        <h3>Session Test:</h3>
+        <button onclick="testSession()">Test Session</button>
+        <div id="sessionResult"></div>
+    </div>
+
+    <div class="debug-info">
+        <h3>Navigation:</h3>
+        <a href="home.html">Go to Home</a> | 
+        <a href="login.html">Go to Login</a> | 
+        <a href="register.html">Go to Register</a>
+    </div>
+
+    <script>
+        // Display current page info
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('pathname').textContent = window.location.pathname;
+        document.getElementById('host').textContent = window.location.host;
+
+        function testSession() {
+            const resultDiv = document.getElementById('sessionResult');
+            resultDiv.innerHTML = 'Testing session...';
+            
+            fetch('../backend/auth/check_session.php')
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Session data:', data);
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>Session Check Result:</strong><br>
+                            Logged in: ${data.logged_in}<br>
+                            User ID: ${data.user_id || 'N/A'}<br>
+                            Username: ${data.username || 'N/A'}
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Session test error:', error);
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <strong>Session Check Failed:</strong><br>
+                            Error: ${error.message}
+                        </div>
+                    `;
+                });
+        }
+    </script>
+</body>
+</html> 

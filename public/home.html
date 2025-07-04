@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MBOOK - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/home.css">
+    <script src="js/main.js" defer></script>
+    <script>
+        // Load books from database
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBooks();
+        });
+
+        function loadBooks() {
+            fetch('../backend/get_books.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Combine database books with default books
+                        const allBooks = [...data.books, ...getDefaultBooks()];
+                        displayBooks(allBooks);
+                    } else {
+                        console.error('Failed to load books:', data.message);
+                        // Show default books if database fails
+                        displayBooks(getDefaultBooks());
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading books:', error);
+                    // Show default books if network fails
+                    displayBooks(getDefaultBooks());
+                });
+        }
+
+        function getDefaultBooks() {
+            return [
+                {
+                    id: 'default1',
+                    title: 'Avetik Isahakyan',
+                    author: 'Avetik Isahakyan',
+                    cover_image: 'images/isahakyan.jpg',
+                    audio_file: 'isahakyan.wav',
+                    category: 'Literature'
+                },
+                {
+                    id: 'default2',
+                    title: 'First Zeitun Resistance',
+                    author: 'Author Name',
+                    cover_image: 'images/zeytun.jpg',
+                    audio_file: 'zeytun.wav',
+                    category: 'History'
+                },
+                {
+                    id: 'default3',
+                    title: 'The Battle of Avarayr',
+                    author: 'Yeghishe',
+                    cover_image: 'images/avarayr.jpg',
+                    audio_file: 'avarayr.wav',
+                    category: 'History'
+                }
+            ];
+        }
+
+        function displayBooks(books) {
+            const booksList = document.querySelector('.books-list');
+            
+            if (books.length === 0) {
+                // Show default books if no books exist
+                displayBooks(getDefaultBooks());
+                return;
+            }
+
+            booksList.innerHTML = books.map(book => `
+                <div class="book-card">
+                    <img src="../${book.cover_image || 'images/default_cover.jpg'}" alt="Book Cover" class="book-cover">
+                    <div class="book-info">
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-author">by ${book.author}</div>
+                        <button class="play-btn" onclick="playBook('${book.title}', '${book.author}', '../${book.cover_image || 'images/default_cover.jpg'}', '${book.audio_file || ''}')">&#9658; Listen</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function playBook(title, author, cover, audioFile) {
+            // Store book info in sessionStorage for the book page
+            sessionStorage.setItem('currentBook', JSON.stringify({
+                title: title,
+                author: author,
+                cover: cover,
+                audioFile: audioFile
+            }));
+            
+            // Navigate to book page
+            window.location.href = 'book.html';
+        }
+    </script>
+</head>
+<body>
+    <header class="main-header">
+        <img src="../images/logo.png" alt="MBOOK Logo" class="logo-img">
+        <div class="search-bar-container">
+            <input type="text" class="search-bar" placeholder="Search for audiobooks...">
+        </div>
+        <div class="header-buttons">
+            <button class="profile-btn" title="Profile">
+                <span class="profile-icon">&#128100;</span>
+            </button>
+            <button class="logout-btn" title="Logout">
+                <span class="logout-icon">&#128682;</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="categories-section">
+            <h2>Categories</h2>
+            <div class="categories-list">
+                <button class="category-btn">Literature</button>
+                <button class="category-btn">History</button>
+                <button class="category-btn">Biology</button>
+                <!-- <button class="category-btn">Mathematics</button> -->
+                <button class="category-btn">Physics</button>
+                <button class="category-btn">Chemistry</button>
+                <button class="category-btn">Geography</button>
+                <!-- <button class="category-btn">Foreign Languages</button>
+                <button class="category-btn">Computer Science</button>
+                <button class="category-btn">Art</button> -->
+            </div>
+        </section>
+
+        <section class="books-section">
+            <h2>Popular Audiobooks</h2>
+            <div class="books-list">
+                <!-- Books will be loaded dynamically -->
+            </div>
+        </section>
+    </main>
+</body>
+</html> 

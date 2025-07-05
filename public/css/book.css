@@ -160,7 +160,7 @@ body {
 }
 
 .profile-btn {
-    background: #b3d8f7;
+    background: #26292b;
     border: none;
     border-radius: 50%;
     width: 44px;
@@ -174,7 +174,9 @@ body {
     transition: background 0.2s;
 }
 .profile-btn:hover {
-    background: #a0c8e6;
+    /* background: #a0c8e6; */
+    transition: 0.2s;
+    box-shadow: 0px 7px 7px rgba(255, 255, 255, 0.5);
 }
 
 .book-content {

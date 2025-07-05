@@ -58,8 +58,12 @@ body {
     gap: 12px;
 }
 
+.header-buttons img{
+    width: 50px;
+    height: auto;
+}
 .profile-btn {
-    background: #b3d8f7;
+    background: #26292b;
     border: none;
     border-radius: 50%;
     width: 48px;
@@ -74,11 +78,15 @@ body {
 }
 
 .profile-btn:hover {
-    background: #a0c8e6;
+    /* background: #a0c8e6; */
+    transition: 0.2s;
+    box-shadow: 0px 7px 7px rgba(255, 255, 255, 0.5);
+    
 }
 
+
 .logout-btn {
-    background: #ff6b6b;
+    background: #26292b;
     border: none;
     border-radius: 50%;
     width: 48px;
@@ -93,7 +101,9 @@ body {
 }
 
 .logout-btn:hover {
-    background: #ff5252;
+    /* background: #ff5252; */
+    transition: 0.2s;
+    box-shadow: 0px 7px 7px rgba(255, 255, 255, 0.5);
 }
 
 .main-content {

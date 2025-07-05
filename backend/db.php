@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$db   = 'MBook'; 
+$db   = 'MBook0'; 
 $user = 'root'; 
 $pass = '';
 $charset = 'utf8mb4';

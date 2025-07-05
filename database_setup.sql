@@ -5,10 +5,10 @@
 -- Run this script in your MySQL database to set up everything needed
 
 -- Create database if it doesn't exist
-CREATE DATABASE IF NOT EXISTS MBook CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS MBook0 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Use the database
-USE MBook;
+USE MBook0;
 
 -- Drop existing tables if they exist (for clean setup)
 DROP TABLE IF EXISTS user_books;
@@ -123,7 +123,7 @@ INSERT INTO books (title, author, description, cover_image, audio_file, category
     'Armenian Folk Tales',
     'Traditional',
     'A collection of traditional Armenian folk tales passed down through generations. These stories capture the wisdom, humor, and cultural richness of Armenian heritage.',
-    'images/folk_tales.jpg',
+    'images/folk_tales.png',
     'folk_tales.wav',
     'Literature',
     30,
@@ -133,7 +133,7 @@ INSERT INTO books (title, author, description, cover_image, audio_file, category
     'The Armenian Genocide: A History',
     'Historical Research',
     'A comprehensive historical account of the Armenian Genocide, providing detailed information about this tragic period in Armenian history.',
-    'images/genocide_history.jpg',
+    'images/genocide_history.png',
     'genocide_history.wav',
     'History',
     90,

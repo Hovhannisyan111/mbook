@@ -130,8 +130,12 @@ function initializeAudioPlayer() {
     // Get book info and set audio source
     const bookInfo = JSON.parse(sessionStorage.getItem('currentBook') || '{}');
     if (bookInfo.title && bookInfo.audioFile) {
-        // Set audio source from book info
-        audio.src = '../' + bookInfo.audioFile;
+        // Set audio source from book info - handle both relative and absolute paths
+        if (bookInfo.audioFile.startsWith('../')) {
+            audio.src = bookInfo.audioFile;
+        } else {
+            audio.src = '../' + bookInfo.audioFile;
+        }
     }
 
     let isPlaying = false;

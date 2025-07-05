@@ -10,15 +10,24 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 try {
-    // Check if user is admin
-    $stmt = $pdo->prepare("SELECT is_admin FROM users WHERE id = ?");
+    // Check if user is admin using admin_users table
+    $stmt = $pdo->prepare("SELECT role FROM admin_users WHERE user_id = ?");
     $stmt->execute([$user_id]);
-    $user = $stmt->fetch();
+    $admin = $stmt->fetch();
 
-    if ($user && $user['is_admin']) {
-        echo json_encode(['is_admin' => true]);
+    if ($admin) {
+        echo json_encode(['is_admin' => true, 'role' => $admin['role']]);
     } else {
-        echo json_encode(['is_admin' => false]);
+        // Fallback to users table for backward compatibility
+        $stmt = $pdo->prepare("SELECT is_admin FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch();
+
+        if ($user && $user['is_admin']) {
+            echo json_encode(['is_admin' => true, 'role' => 'admin']);
+        } else {
+            echo json_encode(['is_admin' => false]);
+        }
     }
 
 } catch (PDOException $e) {

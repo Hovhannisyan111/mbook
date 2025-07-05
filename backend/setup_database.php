@@ -35,11 +35,11 @@ try {
         UNIQUE KEY unique_user_book (user_id, book_id)
     )");
 
-    // Insert sample books
+    // Insert sample books (only if they don't exist)
     $sampleBooks = [
-        ['Avetik Isahakyan', 'Avetik Isahakyan', '../images/isahakyan.jpg', '../isahakyan.wav', 'Literature'],
-        ['First Zeitun Resistance', 'Author Name', '../images/zeytun.jpg', '../zeytun.wav', 'History'],
-        ['The Battle of Avarayr', 'Yeghishe', '../images/avarayr.jpg', '../avarayr.wav', 'History']
+        ['Avetik Isahakyan', 'Avetik Isahakyan', 'images/isahakyan.jpg', 'isahakyan.wav', 'Literature'],
+        ['First Zeitun Resistance', 'Author Name', 'images/zeytun.jpg', 'zeytun.wav', 'History'],
+        ['The Battle of Avarayr', 'Yeghishe', 'images/avarayr.jpg', 'avarayr.wav', 'History']
     ];
 
     $stmt = $pdo->prepare("INSERT IGNORE INTO books (title, author, cover_image, audio_file, category) VALUES (?, ?, ?, ?, ?)");

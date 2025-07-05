@@ -7,30 +7,108 @@
     <link rel="stylesheet" href="css/home.css">
     <script src="js/main.js" defer></script>
     <script>
+        let allBooks = []; // Store all books for filtering
+        let currentCategory = 'all';
+
         // Load books from database
         document.addEventListener('DOMContentLoaded', function() {
             loadBooks();
+            loadCategories();
         });
 
-        function loadBooks() {
-            fetch('../backend/get_books.php')
+        function loadBooks(category = 'all') {
+            const url = category === 'all' 
+                ? '../backend/get_books.php' 
+                : `../backend/get_books_by_category.php?category=${encodeURIComponent(category)}`;
+            
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        // Combine database books with default books
-                        const allBooks = [...data.books, ...getDefaultBooks()];
-                        displayBooks(allBooks);
+                    if (data.success && data.books.length > 0) {
+                        allBooks = data.books;
+                        displayBooks(data.books);
+                        updateCategoryButtons(category);
                     } else {
                         console.error('Failed to load books:', data.message);
                         // Show default books if database fails
-                        displayBooks(getDefaultBooks());
+                        const defaultBooks = getDefaultBooks();
+                        allBooks = defaultBooks;
+                        displayBooks(defaultBooks);
                     }
                 })
                 .catch(error => {
                     console.error('Error loading books:', error);
                     // Show default books if network fails
-                    displayBooks(getDefaultBooks());
+                    const defaultBooks = getDefaultBooks();
+                    allBooks = defaultBooks;
+                    displayBooks(defaultBooks);
                 });
+        }
+
+        function loadCategories() {
+            fetch('../backend/get_categories.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayCategories(data.categories, data.categoriesWithStatus);
+                    } else {
+                        console.error('Failed to load categories:', data.message);
+                        // Show default categories if database fails
+                        displayCategories(['Literature', 'History', 'Biology'], []);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading categories:', error);
+                    // Show default categories if network fails
+                    displayCategories(['Literature', 'History', 'Biology'], []);
+                });
+        }
+
+        function displayCategories(categories, categoriesWithStatus) {
+            const categoriesList = document.querySelector('.categories-list');
+            
+            // Add "All" category button first
+            let categoriesHTML = '<button class="category-btn active">All</button>';
+            
+            // Add category buttons - all look the same
+            categories.forEach(category => {
+                categoriesHTML += `<button class="category-btn">${category}</button>`;
+            });
+            
+            categoriesList.innerHTML = categoriesHTML;
+            
+            // Setup event listeners for category buttons
+            setupCategoryButtons();
+        }
+
+        function setupCategoryButtons() {
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const category = this.textContent;
+                    
+                    // Always reload all books if 'All' is clicked
+                    if (category === 'All') {
+                        currentCategory = 'all';
+                        loadBooks('all');
+                        return;
+                    }
+                    
+                    currentCategory = category;
+                    loadBooks(category);
+                });
+            });
+        }
+
+        function updateCategoryButtons(selectedCategory) {
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            categoryButtons.forEach(button => {
+                button.classList.remove('active');
+                if (button.textContent === selectedCategory || 
+                    (selectedCategory === 'all' && button.textContent === 'All')) {
+                    button.classList.add('active');
+                }
+            });
         }
 
         function getDefaultBooks() {
@@ -40,7 +118,7 @@
                     title: 'Avetik Isahakyan',
                     author: 'Avetik Isahakyan',
                     cover_image: 'images/isahakyan.jpg',
-                    audio_file: 'isahakyan.wav',
+                    audio_file: '../isahakyan.wav',
                     category: 'Literature'
                 },
                 {
@@ -48,7 +126,7 @@
                     title: 'First Zeitun Resistance',
                     author: 'Author Name',
                     cover_image: 'images/zeytun.jpg',
-                    audio_file: 'zeytun.wav',
+                    audio_file: '../zeytun.wav',
                     category: 'History'
                 },
                 {
@@ -56,7 +134,7 @@
                     title: 'The Battle of Avarayr',
                     author: 'Yeghishe',
                     cover_image: 'images/avarayr.jpg',
-                    audio_file: 'avarayr.wav',
+                    audio_file: '../avarayr.wav',
                     category: 'History'
                 }
             ];
@@ -64,12 +142,15 @@
 
         function displayBooks(books) {
             const booksList = document.querySelector('.books-list');
+            const booksSection = document.querySelector('.books-section h2');
             
             if (books.length === 0) {
-                // Show default books if no books exist
-                displayBooks(getDefaultBooks());
+                booksList.innerHTML = '<p>No audiobooks available in this category.</p>';
+                booksSection.textContent = currentCategory === 'all' ? 'Popular Audiobooks' : `${currentCategory} Audiobooks`;
                 return;
             }
+
+            booksSection.textContent = currentCategory === 'all' ? 'Popular Audiobooks' : `${currentCategory} Audiobooks`;
 
             booksList.innerHTML = books.map(book => `
                 <div class="book-card">
@@ -77,6 +158,7 @@
                     <div class="book-info">
                         <div class="book-title">${book.title}</div>
                         <div class="book-author">by ${book.author}</div>
+                        <div class="book-category">${book.category || 'Uncategorized'}</div>
                         <button class="play-btn" onclick="playBook('${book.title}', '${book.author}', '../${book.cover_image || 'images/default_cover.jpg'}', '${book.audio_file || ''}')">&#9658; Listen</button>
                     </div>
                 </div>
@@ -117,16 +199,7 @@
         <section class="categories-section">
             <h2>Categories</h2>
             <div class="categories-list">
-                <button class="category-btn">Literature</button>
-                <button class="category-btn">History</button>
-                <button class="category-btn">Biology</button>
-                <!-- <button class="category-btn">Mathematics</button> -->
-                <button class="category-btn">Physics</button>
-                <button class="category-btn">Chemistry</button>
-                <button class="category-btn">Geography</button>
-                <!-- <button class="category-btn">Foreign Languages</button>
-                <button class="category-btn">Computer Science</button>
-                <button class="category-btn">Art</button> -->
+                <!-- Categories will be loaded dynamically -->
             </div>
         </section>
 

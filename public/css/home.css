@@ -109,9 +109,11 @@ body {
 
 .categories-list {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 12px;
     margin-bottom: 32px;
+    overflow-x: auto;
+    padding-bottom: 8px;
 }
 
 .category-btn {
@@ -123,11 +125,20 @@ body {
     font-size: 1rem;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .category-btn:hover {
     background: #b3d8f7;
     color: #232526;
+}
+
+.category-btn.active {
+    background: #b3d8f7;
+    color: #232526;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(179, 216, 247, 0.3);
 }
 
 .books-list {
@@ -170,7 +181,14 @@ body {
 .book-author {
     font-size: 0.95rem;
     color: #b3d8f7;
+    margin-bottom: 6px;
+}
+
+.book-category {
+    font-size: 0.85rem;
+    color: #888;
     margin-bottom: 10px;
+    font-style: italic;
 }
 
 .play-btn {

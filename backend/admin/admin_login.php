@@ -13,16 +13,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Check if user exists and is admin
-        $stmt = $pdo->prepare("SELECT id, username, password_hash, is_admin FROM users WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT u.id, u.username, u.password_hash, u.is_admin, a.role 
+                               FROM users u 
+                               LEFT JOIN admin_users a ON u.id = a.user_id 
+                               WHERE u.email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password_hash'])) {
-            if ($user['is_admin']) {
+            // Check if user is admin (either in admin_users table or has is_admin flag)
+            if ($user['role'] || $user['is_admin']) {
                 // Admin login successful
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['is_admin'] = true;
+                $_SESSION['admin_role'] = $user['role'] ?: 'admin';
                 
                 echo json_encode(['success' => true, 'message' => 'Admin login successful']);
             } else {

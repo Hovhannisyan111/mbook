@@ -15,10 +15,10 @@
             </div>
             <nav class="sidebar-menu">
                 <a href="home.html" class="sidebar-link">Home</a>
-                <a href="profile.html" class="sidebar-link">My Library</a>
+                <a href="profile.php" class="sidebar-link">My Library</a>
                 <a href="upload.html" class="sidebar-link">Upload Book</a>
             </nav>
-            <div class="sidebar-similar">
+            <!-- <div class="sidebar-similar">
                 <h3>Similar Books</h3>
                 <ul class="similar-books-list">
                     <li class="similar-book-item">
@@ -34,7 +34,7 @@
                         <span class="similar-book-title">1984</span>
                     </li>
                 </ul>
-            </div>
+            </div> -->
         </aside>
         <main class="book-main">
             <header class="book-header">
@@ -91,6 +91,46 @@
             
             // Initialize audio player
             initializeAudioPlayer();
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const bookInfo = JSON.parse(sessionStorage.getItem('currentBook') || '{}');
+
+            if (bookInfo.title) {
+                document.getElementById('bookTitle').textContent = bookInfo.title;
+                document.getElementById('bookAuthor').textContent = bookInfo.author;
+                document.getElementById('bookCover').src = bookInfo.cover;
+            }
+
+            // Подключим аудиофайл
+            const audio = new Audio(bookInfo.audioFile);
+            let hasSentReading = false;
+
+            // при воспроизведении → отправим "reading"
+            audio.addEventListener('play main', () => {
+                if (!hasSentReading && bookInfo.bookId) {
+                    hasSentReading = true;
+                    fetch('../backend/update_book_status.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `book_id=${encodeURIComponent(bookInfo.bookId)}&status=reading`
+                    });
+                }
+            });
+
+            // при завершении → отправим "finished"
+            audio.addEventListener('ended', () => {
+                if (bookInfo.bookId) {
+                    fetch('../backend/update_book_status.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `book_id=${encodeURIComponent(bookInfo.bookId)}&status=finished`
+                    });
+                }
+            });
+
+            // ты можешь встроить audio в HTML, или использовать свою кнопку play:
+            // document.querySelector('.play-main').addEventListener('click', () => audio.play());
         });
     </script>
 </body>

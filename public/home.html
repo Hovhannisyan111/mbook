@@ -161,20 +161,27 @@
                         <div class="book-category">${book.category || 'Uncategorized'}</div>
                         <button class="play-btn" onclick="playBook('${book.title}', '${book.author}', '../${book.cover_image || 'images/default_cover.jpg'}', '${book.audio_file || ''}')">&#9658; Listen</button>
                     </div>
+
                 </div>
             `).join('');
         }
 
-        function playBook(title, author, cover, audioFile) {
-            // Store book info in sessionStorage for the book page
+        function playBook(title, author, cover, audioFile, bookId) {
+            // Сохраняем в sessionStorage
             sessionStorage.setItem('currentBook', JSON.stringify({
                 title: title,
                 author: author,
                 cover: cover,
-                audioFile: audioFile
+                audioFile: audioFile,
+                bookId: bookId
             }));
-            
-            // Navigate to book page
+
+            fetch('../backend/insert_book_status.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `book_id=${encodeURIComponent(bookId)}&status=saved`
+            });
+
             window.location.href = 'book.html';
         }
     </script>
@@ -213,4 +220,4 @@
         </section>
     </main>
 </body>
-</html> 
+</html>

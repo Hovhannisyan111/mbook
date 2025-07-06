@@ -69,7 +69,7 @@ function setupEventListeners() {
     const profileBtn = document.querySelector('.profile-btn');
     if (profileBtn) {
         profileBtn.addEventListener('click', function() {
-            window.location.href = 'profile.html';
+            window.location.href = 'profile.php';
         });
     }
 
